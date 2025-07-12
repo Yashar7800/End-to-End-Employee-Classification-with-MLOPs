@@ -1,1 +1,15 @@
-key: val
+COLUMNS:
+  Education: object
+  JoiningYear: int64 
+  City: object
+  PaymentTier: int64 
+  Age: int64 
+  Gender: object
+  EverBenched: object
+  ExperienceInCurrentDomain: int64
+  LeaveOrNot: int64 
+  
+  
+  
+TARGET_COLUMN:
+  name: LeaveOrNot 

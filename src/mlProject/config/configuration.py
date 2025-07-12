@@ -3,7 +3,7 @@
 
 from mlProject.constants import *
 from mlProject.utils.common import read_yaml, create_directories
-from mlProject.entity.config_entity import DataIngestionConfig
+from mlProject.entity.config_entity import (DataIngestionConfig, DataValidationConfig)
 
 class ConfigurationManager:
     def __init__(self,
@@ -29,3 +29,24 @@ class ConfigurationManager:
         )
 
         return data_ingestion_config
+    
+
+# Updating configuration manager in src config
+# Next we need to read the Yaml file.then we will write some functions in the constants folder. we define that 3 functionto read the yaml files.
+# after that we will import functions like read_yaml, create_directories from utils.common
+
+    def get_data_validation_config(self) -> DataValidationConfig:
+        config = self.config.data_validation
+        schema = self.schema.COLUMNS
+
+        create_directories([config.root_dir])
+
+        data_validation_config = DataValidationConfig(
+            unzip_data_dir = config.unzip_data_dir,
+            root_dir = config.root_dir,
+            STATUS_FILE= config.STATUS_FILE,
+            all_schema= schema
+
+        )
+
+        return data_validation_config
