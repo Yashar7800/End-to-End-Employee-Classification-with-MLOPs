@@ -1,1 +1,4 @@
-key: val
+GradientBoostingClassifier:
+  classifier__n_estimators: 0.01
+  classifier__learning_rate: 5
+  classifier__max_depth: 300
