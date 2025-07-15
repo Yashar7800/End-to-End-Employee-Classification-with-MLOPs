@@ -23,3 +23,15 @@ class DataValidationConfig:
 class DataTransformationConfig:
     root_dir: Path
     data_path: Path
+
+
+@dataclass(frozen=True)
+class ModelTrainerConfig:
+    root_dir: Path
+    data_path: Path
+    preprocessor_path: Path
+    model_path: Path
+    n_estimators: float
+    learning_rate: int
+    max_depth: int   # will define parameters in params.yaml
+    target_column: str  # will get target column from schema.yaml
