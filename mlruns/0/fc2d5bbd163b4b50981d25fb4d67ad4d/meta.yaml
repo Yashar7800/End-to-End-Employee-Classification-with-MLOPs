@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Yashar/End-to-End-Employee-Classification-with-MLOPs/mlruns/0/fc2d5bbd163b4b50981d25fb4d67ad4d/artifacts
+end_time: 1752587430679
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: fc2d5bbd163b4b50981d25fb4d67ad4d
+run_name: luminous-zebra-836
+run_uuid: fc2d5bbd163b4b50981d25fb4d67ad4d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1752587422265
+status: 3
+tags: []
+user_id: Yashar

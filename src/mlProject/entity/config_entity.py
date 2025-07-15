@@ -35,3 +35,15 @@ class ModelTrainerConfig:
     learning_rate: int
     max_depth: int   # will define parameters in params.yaml
     target_column: str  # will get target column from schema.yaml
+
+
+@dataclass(frozen=True)
+class ModelEvaluationConfig:
+    root_dir: Path
+    data_path: Path
+    preprocessor_path: Path
+    model_path: Path
+    all_params: dict
+    metric_file_name: Path
+    target_column: str
+    mlflow_uri: str

@@ -65,12 +65,12 @@ open up you local host and port
 ### dagshub
 [dagshub](https://dagshub.com/)
 
-MLFLOW_TRACKING_URI = https://dagshub.com/Yashar7800/End-to-end-ML-Project-with-MLflow.mlflow
+MLFLOW_TRACKING_URI = https://dagshub.com/Yashar7800/End-to-End-Employee-Classification-with-MLOPs.mlflow \
 MLFLOW_TRACKING_USERNAME=yashar7800 \
 MLFLOW_TRACKING_PASSWORD=@lucy1378 \
 python script.py
 import dagshub
-dagshub.init(repo_owner='Yashar7800', repo_name='End-to-end-ML-Project-with-MLflow', mlflow=True)
+dagshub.init(repo_owner='Yashar7800', repo_name='End to End Employee Classification with MLOPs', mlflow=True)
 
 import mlflow
 with mlflow.start_run():
@@ -81,7 +81,7 @@ Run this to export as env variables:
 
 ```bash
 
-export MLFLOW_TRACKING_URI=https://dagshub.com/Yashar7800/End-to-end-ML-Project-with-MLflow.mlflow
+export MLFLOW_TRACKING_URI=https://dagshub.com/Yashar7800/End-to-End-Employee-Classification-with-MLOPs.mlflow
 
 export MLFLOW_TRACKING_USERNAME= yashar7800 
 
