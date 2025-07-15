@@ -1,0 +1,146 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+
+permissions:
+  id-token: write # Required for OpenID Connect (OIDC) for more secure AWS authentication (recommended for future)
+  contents: read
+
+jobs:
+  integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4 # Updated to v4 for latest features and security
+
+      - name: Lint code
+        run: echo "Linting repository" # Placeholder: Replace with actual linting command (e.g., pylint, flake8)
+
+      - name: Run unit tests
+        run: echo "Running unit tests" # Placeholder: Replace with actual unit test command (e.g., pytest)
+
+  build-and-push-ecr-image:
+    name: Continuous Delivery - Build & Push
+    needs: integration # This job depends on the 'integration' job to succeed first
+    runs-on: ubuntu-latest
+    
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4 # Updated to v4
+
+      - name: Install Utilities
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip # Install necessary utilities like 'jq' for AWS CLI parsing if needed
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4 # Updated to v4 for better security and Node.js version support
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }} # This should be 'eu-north-1' as per your ECR repository location
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2 # Updated to v2 for improved security (e.g., password masking)
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image # This ID is crucial for referencing this step's outputs
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }} # Ensure this secret holds the exact ECR repository name
+          IMAGE_TAG: ${{ github.sha }} # Using Git commit SHA for unique and traceable image tags
+          # If you prefer a simpler 'latest' tag, uncomment the line below and comment out the one above:
+          # IMAGE_TAG: latest
+        run: |
+          # Build the Docker container from your project's Dockerfile (assuming it's in the root)
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          
+          # Push the built Docker image to your ECR repository
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
+          # Set the full image URI as a step output using the new syntax (fixes deprecated set-output warning)
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          
+          # --- DEBUGGING LINES: Verify output is set ---
+          echo "DEBUG: Image output set to: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "DEBUG: GITHUB_OUTPUT content after setting image:"
+          cat $GITHUB_OUTPUT # This will show what's written to the output file
+
+  Continuous-Deployment:
+    name: Continuous Delivery - Deploy
+    needs: build-and-push-ecr-image # Keep this dependency for job order
+    runs-on: self-hosted
+    # REMOVE THE JOB-LEVEL 'env:' BLOCK HERE!
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr # This re-logs into ECR on the self-hosted runner, useful for robustness
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Pull latest image from ECR
+        env: # Define env vars here, within the step's scope
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # This will now be evaluated correctly after 'login-ecr' runs
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ github.sha }} # Ensure this matches the tag used in the build job
+          # If you switched to 'latest' tag in build job, uncomment below and comment out above:
+          # IMAGE_TAG: latest
+        run: |
+          # Use the environment variables defined at this step level to construct the full image URI
+          FULL_IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "DEBUG: Attempting to pull image: $FULL_IMAGE_URI"
+          docker pull "$FULL_IMAGE_URI"
+          echo "Successfully pulled image: $FULL_IMAGE_URI"
+          
+      - name: Stop and remove container if running
+        run: |
+          # Check if a container named 'mlproj' is already running. If so, stop and remove it.
+          if docker ps -q --filter "name=mlproj" | grep -q .; then
+            echo "Stopping and removing existing 'mlproj' container..."
+            docker stop mlproj
+            docker rm -fv mlproj
+          else
+            echo "No existing 'mlproj' container found. Proceeding."
+          fi
+        
+      - name: Run Docker Image to serve users
+        env: # Define env vars here again, within this step's scope
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # This will also be evaluated correctly
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: ${{ github.sha }} # Ensure this matches the tag used in the build job
+          # If you switched to 'latest' tag in build job, uncomment below and comment out above:
+          # IMAGE_TAG: latest
+        run: |
+          # Use the environment variables defined at this step level to construct the full image URI
+          FULL_IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          # Run the new Docker container. Ensure exposed port (8080) matches your application's port.
+          # Environment variables for AWS credentials are passed for application access if needed.
+          docker run -d -p 8080:8080 --name=mlproj \
+            -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' \
+            -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' \
+            -e 'AWS_REGION=${{ secrets.AWS_REGION }}' \
+            "$FULL_IMAGE_URI" # Use the constructed URI here
+          echo "Container 'mlproj' started on port 8080. Check 'docker ps' for status."
+
+      - name: Clean previous images and containers
+        run: |
+          # Prune unused Docker objects (images, containers, volumes, networks) to free up space
+          docker system prune -f --volumes # Added --volumes to prune volumes as well
+          echo "Docker system pruned."

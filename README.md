@@ -124,7 +124,7 @@ export MLFLOW_TRACKING_PASSWORD= @Lucy1378
 
 	
 ## 3. Create ECR repo to store/save docker image
-    - Save the URI: 732898683734.dkr.ecr.eu-north-1.amazonaws.com/end-to-end-ml-project
+    - Save the URI: 732898683734.dkr.ecr.eu-north-1.amazonaws.com/employee-turnover
 
 	
 ## 4. Create EC2 machine (Ubuntu) 
@@ -142,7 +142,6 @@ export MLFLOW_TRACKING_PASSWORD= @Lucy1378
 
 	curl -fsSL https://get.docker.com -o get-docker.sh
 
-	sudo sh get-docker.sh
 
 	sudo usermod -aG docker ubuntu
 
