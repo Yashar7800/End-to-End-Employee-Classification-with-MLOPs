@@ -1,0 +1,150 @@
+/* General body styling */
+body {
+    background-color: #f8f9fa; /* Light gray background for a clean look */
+    font-family: 'Open Sans', sans-serif; /* Use Google Font from your HTML */
+}
+
+/* Form container styling */
+.form-v9-content {
+    background: linear-gradient(135deg, #e6f0fa, #d1e0f0); /* Blue-gray gradient */
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+    padding: 40px;
+    max-width: 900px;
+    margin: 30px auto; /* Center form */
+}
+
+/* Form heading */
+.form-detail h2 {
+    color: #2c3e50; /* Dark blue-gray */
+    font-family: 'Nunito', sans-serif; /* Use Nunito if available */
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* Form rows */
+.form-row-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    flex-wrap: wrap; /* Stack on small screens */
+}
+
+/* Individual form fields */
+.form-row {
+    flex: 1;
+    min-width: 280px; /* Ensure fields aren't too narrow */
+    margin: 10px;
+}
+
+/* Labels */
+.form-row label {
+    color: #2c3e50;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Text inputs and dropdowns */
+.input-text, select.input-text {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover and focus effects */
+.input-text:focus, select.input-text:focus {
+    border-color: #007bff; /* Bootstrap blue */
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* Dropdown styling */
+select.input-text {
+    appearance: none;
+    background: url('data:image/svg+xml;utf8,<svg fill="%232c3e50" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') no-repeat right 12px center;
+    background-size: 18px;
+}
+
+/* Submit button */
+.register {
+    background: #007bff;
+    color: white;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    margin: 20px auto;
+}
+
+.register:hover {
+    background: #0056b3; /* Darker blue on hover */
+}
+
+/* Prediction result */
+.prediction-result {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 1s ease-in;
+    margin: 20px 0;
+}
+
+/* Color classes for prediction text */
+.leave {
+    color: #dc3545; /* Red for "Will Leave" */
+}
+
+.stay {
+    color: #28a745; /* Green for "Will Stay" */
+}
+
+/* Back button */
+.back-button {
+    display: inline-block;
+    margin: 30px auto;
+    padding: 14px 30px;
+    background: #28a745; /* Green */
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background: #218838; /* Darker green on hover */
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-row {
+        min-width: 100%; /* Full width on mobile */
+    }
+    .form-v9-content {
+        padding: 20px;
+        margin: 15px;
+    }
+    .prediction-result {
+        font-size: 2rem; /* Smaller on mobile */
+    }
+}
