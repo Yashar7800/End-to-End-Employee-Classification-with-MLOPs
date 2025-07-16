@@ -10,16 +10,18 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install Gunicorn separately (ensures it's installed even if requirements.txt fails)
+RUN pip install gunicorn==20.1.0
+
 # Copy the rest of the project
 COPY . .
 
-# Expose port for Flask (5000 for ECS/EC2, adjust to 8080 for SageMaker)
+# Expose port (5000 for ECS/EC2, change to 8080 for SageMaker)
 EXPOSE 5000
 
 # Set Flask environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 
-# Run Flask with production-ready Gunicorn
-RUN pip install gunicorn
+# Run Gunicorn for production
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
